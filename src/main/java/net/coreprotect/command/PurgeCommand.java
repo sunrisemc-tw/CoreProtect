@@ -38,6 +38,7 @@ import net.coreprotect.utility.ChatMessage;
 import net.coreprotect.utility.Color;
 import net.coreprotect.utility.EntityUtils;
 import net.coreprotect.utility.EntitySpawnTracking;
+import net.coreprotect.utility.LocaleUtils;
 import net.coreprotect.utility.MaterialUtils;
 import net.coreprotect.utility.VersionUtils;
 import net.coreprotect.utility.ErrorReporter;
@@ -254,6 +255,7 @@ public class PurgeCommand extends Consumer {
                     targetName = ((Material) restrictTarget).name().toLowerCase(Locale.ROOT);
                     item = (!item ? !(((Material) restrictTarget).isBlock()) : item);
                     hasBlock = true;
+                    targetName = LocaleUtils.translateMaterial(player, targetName);
                 }
                 else if (restrictTarget instanceof EntityType) {
                     targetName = ((EntityType) restrictTarget).name();
@@ -266,6 +268,7 @@ public class PurgeCommand extends Consumer {
 
                     targetName = ((EntityType) restrictTarget).name().toLowerCase(Locale.ROOT);
                     entity = true;
+                    targetName = LocaleUtils.translateEntity(player, targetName);
                 }
                 else if (restrictTarget instanceof String) {
                     int blockId = MaterialUtils.getBlockId((String) restrictTarget, false);

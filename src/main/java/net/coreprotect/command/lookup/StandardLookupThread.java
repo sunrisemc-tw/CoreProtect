@@ -486,7 +486,8 @@ public class StandardLookupThread implements Runnable {
                                 }
 
                                 String coordinateInfo = entityLocation == null ? "" : entityLocation.getOriginTooltip();
-                                Chat.sendComponent(player, timeago + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, ChatUtils.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + coordinateInfo + ChatUtils.filterComponent(player.hasPermission("coreprotect.give"), ChatUtils.createGiveItemComponent(Color.GREY + "(↓)", command.getName(), itemId)) + Color.WHITE, selector));
+                                String dnameDisplay = net.coreprotect.utility.LocaleUtils.translateMaterial(player, dname);
+                                Chat.sendComponent(player, timeago + " " + tag + " " + Phrase.build(Phrase.LOOKUP_CONTAINER, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, ChatUtils.createTooltip(Color.DARK_AQUA + rbd + dnameDisplay, tooltip) + coordinateInfo + ChatUtils.filterComponent(player.hasPermission("coreprotect.give"), ChatUtils.createGiveItemComponent(Color.GREY + "(↓)", command.getName(), itemId)) + Color.WHITE, selector));
                                 PluginChannelListener.getInstance().sendData(player, Integer.parseInt(time), Phrase.LOOKUP_CONTAINER, selector, dplayer, dname, amount, dataX, dataY, dataZ, wid, rbd, true, tag.contains("+"));
                             }
                         }
@@ -557,6 +558,18 @@ public class StandardLookupThread implements Runnable {
                                     dname = blockNameSplit[1];
                                 }
 
+                                // Translate the identifier into the viewer's language via FoxLocale (soft dependency).
+                                // Player names (isPlayer) are never translated.
+                                boolean dnameIsEntity = !isPlayer && (entityInteraction
+                                        || ((daction == LookupActions.ENTITY_KILL || daction == LookupActions.ENTITY_SPAWN)
+                                                && !placedEntitySpawn && !placedEntityKill && amount == -1));
+                                String dnameDisplay = dname;
+                                if (!isPlayer) {
+                                    dnameDisplay = dnameIsEntity
+                                            ? net.coreprotect.utility.LocaleUtils.translateEntity(player, dname)
+                                            : net.coreprotect.utility.LocaleUtils.translateMaterial(player, dname);
+                                }
+
                                 // Functions.sendMessage(player2, timeago+" " + ChatColors.WHITE + "- " + ChatColors.DARK_AQUA+rbd+""+dplayer+" " + ChatColors.WHITE+rbd+""+a+" " + ChatColors.DARK_AQUA+rbd+"#"+dtype+ChatColors.WHITE + ". " + ChatColors.GREY + "(x"+x+"/y"+y+"/z"+z+")");
 
                                 Phrase phrase = Phrase.LOOKUP_BLOCK;
@@ -592,7 +605,7 @@ public class StandardLookupThread implements Runnable {
                                         action = "a:container";
                                     }
 
-                                    Chat.sendComponent(player, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, ChatUtils.createTooltip(Color.DARK_AQUA + rbd + dname, tooltip) + ChatUtils.filterComponent(player.hasPermission("coreprotect.give"), ChatUtils.createGiveItemComponent(Color.GREY + "(↓)", command.getName(), itemId)) + Color.WHITE, selector));
+                                    Chat.sendComponent(player, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, "x" + amount, ChatUtils.createTooltip(Color.DARK_AQUA + rbd + dnameDisplay, tooltip) + ChatUtils.filterComponent(player.hasPermission("coreprotect.give"), ChatUtils.createGiveItemComponent(Color.GREY + "(↓)", command.getName(), itemId)) + Color.WHITE, selector));
                                     PluginChannelListener.getInstance().sendData(player, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), dataX, dataY, dataZ, wid, rbd, action.contains("container"), tag.contains("+"));
                                 }
                                 else {
@@ -627,7 +640,7 @@ public class StandardLookupThread implements Runnable {
                                         tag = (daction != LookupActions.BLOCK_BREAK ? Color.GREEN + "+" : Color.RED + "-");
                                     }
 
-                                    Chat.sendComponent(player, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, Color.DARK_AQUA + rbd + dname + Color.WHITE, selector));
+                                    Chat.sendComponent(player, timeago + " " + tag + " " + Phrase.build(phrase, Color.DARK_AQUA + rbd + dplayer + Color.WHITE + rbd, Color.DARK_AQUA + rbd + dnameDisplay + Color.WHITE, selector));
                                     PluginChannelListener.getInstance().sendData(player, Integer.parseInt(time), phrase, selector, dplayer, dname, (tag.contains("+") ? 1 : -1), dataX, dataY, dataZ, wid, rbd, false, tag.contains("+"));
                                 }
 
@@ -697,6 +710,8 @@ public class StandardLookupThread implements Runnable {
             if (materialName.startsWith("minecraft:")) {
                 materialName = materialName.substring("minecraft:".length());
             }
+            // Translate the identifier into the viewer's language via FoxLocale (soft dependency).
+            String materialNameDisplay = net.coreprotect.utility.LocaleUtils.translateMaterial(player, materialName);
 
             long removedAmount = row.getRemovedAmount();
             long placedAmount = row.getPlacedAmount();
@@ -704,7 +719,7 @@ public class StandardLookupThread implements Runnable {
             String formattedNetAmount = (netAmount >= 0 ? "+" : "") + numberFormat.format(netAmount);
             Chat.sendComponent(player, Color.DARK_AQUA + userName + Color.WHITE + ": " + Color.RED + "-" + numberFormat.format(removedAmount)
                     + Color.GREY + " / " + Color.GREEN + "+" + numberFormat.format(placedAmount) + Color.WHITE + " = " + formattedNetAmount
-                    + Color.WHITE + " " + Color.DARK_AQUA + materialName + Color.WHITE);
+                    + Color.WHITE + " " + Color.DARK_AQUA + materialNameDisplay + Color.WHITE);
         }
 
         if (totalRows > displayResults) {

@@ -135,8 +135,10 @@ public class BlockLookup {
                 }
 
                 String target;
+                boolean targetIsEntity = false;
                 if (resultAction == 3 || resultAction == LookupActions.ENTITY_SPAWN) {
                     target = EntityUtils.getEntityType(resultType).name();
+                    targetIsEntity = true;
                 }
                 else {
                     target = MaterialUtils.getBlockDisplayName(resultType, resultData);
@@ -153,7 +155,10 @@ public class BlockLookup {
                     target = target.split(":")[1];
                 }
 
-                resultTextBuilder.append(timeAgo + " " + tag + " ").append(Phrase.build(phrase, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, Color.DARK_AQUA + rbFormat + target + Color.WHITE, selector)).append("\n");
+                // Translate the identifier into the viewer's language via FoxLocale (soft dependency).
+                String displayTarget = targetIsEntity ? LocaleUtils.translateEntity(commandSender, target) : LocaleUtils.translateMaterial(commandSender, target);
+
+                resultTextBuilder.append(timeAgo + " " + tag + " ").append(Phrase.build(phrase, Color.DARK_AQUA + rbFormat + resultUser + Color.WHITE + rbFormat, Color.DARK_AQUA + rbFormat + displayTarget + Color.WHITE, selector)).append("\n");
                 PluginChannelListener.getInstance().sendData(commandSender, resultTime, phrase, selector, resultUser, target, -1, x, y, z, worldId, rbFormat, false, tag.contains("+"));
             }
 
@@ -176,7 +181,8 @@ public class BlockLookup {
                     // resultText = Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Color.WHITE + "No block data found at " + Color.ITALIC + "x" + x + "/y" + y + "/z" + z + ".";
                     resultText = Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA_LOCATION, Selector.FIRST);
                     if (!blockName.equals("air") && !blockName.equals("cave_air")) {
-                        resultText = Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA, Color.ITALIC + block.getType().name().toLowerCase(Locale.ROOT) + Color.WHITE) + "\n";
+                        String noDataName = LocaleUtils.translateMaterial(commandSender, block.getType().name().toLowerCase(Locale.ROOT));
+                        resultText = Color.DARK_AQUA + "CoreProtect " + Color.WHITE + "- " + Phrase.build(Phrase.NO_DATA, Color.ITALIC + noDataName + Color.WHITE) + "\n";
                     }
                 }
             }

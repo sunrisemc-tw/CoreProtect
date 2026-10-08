@@ -19,6 +19,7 @@ import net.coreprotect.model.item.ItemTransactionActions;
 import net.coreprotect.utility.Chat;
 import net.coreprotect.utility.Color;
 import net.coreprotect.utility.ErrorReporter;
+import net.coreprotect.utility.LocaleUtils;
 
 public class RollbackComplete {
 
@@ -132,6 +133,7 @@ public class RollbackComplete {
                         targetName = ((Material) restrictTarget).name().toLowerCase(Locale.ROOT);
                         item = (!item ? !(((Material) restrictTarget).isBlock()) : item);
                         material = true;
+                        targetName = LocaleUtils.translateMaterial(user, targetName);
                     }
                     else if (restrictTarget instanceof String) {
                         targetName = ((String) restrictTarget).toLowerCase(Locale.ROOT);
@@ -140,6 +142,7 @@ public class RollbackComplete {
                     else if (restrictTarget instanceof EntityType) {
                         targetName = ((EntityType) restrictTarget).name().toLowerCase(Locale.ROOT);
                         entity = true;
+                        targetName = LocaleUtils.translateEntity(user, targetName);
                     }
 
                     if (targetCount == 0) {
@@ -194,6 +197,7 @@ public class RollbackComplete {
                         targetName = ((Material) excludeTarget).name().toLowerCase(Locale.ROOT);
                         item = (!item ? !(((Material) excludeTarget).isBlock()) : item);
                         material = true;
+                        targetName = LocaleUtils.translateMaterial(user, targetName);
                     }
                     else if (excludeTarget instanceof String) {
                         targetName = ((String) excludeTarget).toLowerCase(Locale.ROOT);
@@ -202,6 +206,7 @@ public class RollbackComplete {
                     else if (excludeTarget instanceof EntityType) {
                         targetName = ((EntityType) excludeTarget).name().toLowerCase(Locale.ROOT);
                         entity = true;
+                        targetName = LocaleUtils.translateEntity(user, targetName);
                     }
 
                     if (excludeCount == 0) {
